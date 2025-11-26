@@ -22,13 +22,17 @@ A premium, AI-powered data analysis platform with natural language querying, sem
 
 ```bash
 # 1. Clone the repository
-git clone <your-repo-url>
-cd thermal-filament
+git clone https://github.com/karuppusamym/ACS.git
+cd ACS
 
 # 2. Set up environment variables
 cd backend
 cp .env.example .env
 # Edit .env with your API keys and secrets
+
+cd ../frontend
+cp .env.example .env.local
+# Edit .env.local with NEXT_PUBLIC_API_URL=http://localhost:8000
 
 # 3. Start all services
 cd ..
@@ -45,6 +49,12 @@ docker-compose up -d
 **Backend**:
 ```bash
 cd backend
+python -m venv .venv
+# Windows:
+.\.venv\Scripts\Activate.ps1
+# Linux/Mac:
+source .venv/bin/activate
+
 pip install -r requirements.txt
 cp .env.example .env
 # Edit .env with your values
@@ -55,6 +65,8 @@ python main.py
 ```bash
 cd frontend
 npm install
+cp .env.example .env.local
+# Edit .env.local with NEXT_PUBLIC_API_URL=http://localhost:8000
 npm run dev
 ```
 
@@ -85,7 +97,7 @@ npm run dev
 ### Project Structure
 
 ```
-thermal-filament/
+ACS/
 ├── frontend/                 # Next.js application
 │   ├── app/                 # App router pages
 │   ├── components/          # React components
