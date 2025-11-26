@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Send, Loader2, Database, Code, CheckCircle, XCircle } from "lucide-react";
+import apiClient from "@/lib/api-client";
 
 interface Connection {
     id: number;
@@ -47,13 +48,10 @@ export default function ChatPage() {
 
     const fetchConnections = async () => {
         try {
-            const response = await fetch("http://127.0.0.1:8000/api/v1/connection/connections");
-            if (response.ok) {
-                const data = await response.json();
-                setConnections(data);
-                if (data.length > 0) {
-                    setSelectedConnection(data[0].id);
-                }
+            const data = await apiClient.connections.list();
+            setConnections(data);
+            if (data.length > 0) {
+                setSelectedConnection(data[0].id);
             }
         } catch (error) {
             console.error("Error fetching connections:", error);
@@ -73,46 +71,31 @@ export default function ChatPage() {
         setLoading(true);
 
         try {
-            const response = await fetch("http://127.0.0.1:8000/api/v1/agent/chat", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    query: input,
-                    connection_id: selectedConnection,
-                    session_id: sessionId,
-                    execute_sql: true
-                })
+            const data = await apiClient.post("/api/v1/agent/chat", {
+                query: input,
+                connection_id: selectedConnection,
+                session_id: sessionId,
+                execute_sql: true
             });
 
-            if (response.ok) {
-                const data = await response.json();
-
-                // Update session ID
-                if (!sessionId) {
-                    setSessionId(data.session_id);
-                }
-
-                const assistantMessage: Message = {
-                    role: "assistant",
-                    content: data.explanation || "Query executed successfully",
-                    sql: data.sql,
-                    explanation: data.explanation,
-                    execution: data.execution
-                };
-
-                setMessages(prev => [...prev, assistantMessage]);
-            } else {
-                const error = await response.json();
-                const errorMessage: Message = {
-                    role: "assistant",
-                    content: `Error: ${error.detail || "Failed to process query"}`
-                };
-                setMessages(prev => [...prev, errorMessage]);
+            // Update session ID
+            if (!sessionId && data.session_id) {
+                setSessionId(data.session_id);
             }
-        } catch (error) {
+
+            const assistantMessage: Message = {
+                role: "assistant",
+                content: data.explanation || "Query executed successfully",
+                sql: data.sql,
+                explanation: data.explanation,
+                execution: data.execution
+            };
+
+            setMessages(prev => [...prev, assistantMessage]);
+        } catch (error: any) {
             const errorMessage: Message = {
                 role: "assistant",
-                content: `Error: ${error}`
+                content: `Error: ${error.message || "Failed to process query"}`
             };
             setMessages(prev => [...prev, errorMessage]);
         } finally {

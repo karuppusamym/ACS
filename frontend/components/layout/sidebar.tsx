@@ -7,13 +7,28 @@ import { LayoutDashboard, Settings, Database, MessageSquare, Activity, User as U
 
 const sidebarItems = [
     {
+        title: "Dashboard",
+        href: "/",
+        icon: LayoutDashboard,
+    },
+    {
+        title: "Chat",
+        href: "/chat",
+        icon: MessageSquare,
+    },
+    {
         title: "Analysis",
         href: "/analysis",
-        icon: MessageSquare,
+        icon: Activity,
     },
     {
         title: "Data Models",
         href: "/models",
+        icon: Database,
+    },
+    {
+        title: "Documents",
+        href: "/documents",
         icon: Database,
     },
     {
@@ -27,8 +42,8 @@ const sidebarItems = [
         icon: Settings,
     },
     {
-        title: "Users",
-        href: "/admin/users",
+        title: "Admin",
+        href: "/admin",
         icon: UserIcon,
     },
 ];

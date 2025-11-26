@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { BarChart3, LineChart, PieChart, TrendingUp, Database, Activity } from "lucide-react";
+import apiClient from "@/lib/api-client";
 
 interface Connection {
     id: number;
@@ -31,13 +32,10 @@ export default function DashboardPage() {
 
     const fetchConnections = async () => {
         try {
-            const response = await fetch("http://127.0.0.1:8000/api/v1/connection/connections");
-            if (response.ok) {
-                const data = await response.json();
-                setConnections(data);
-                if (data.length > 0) {
-                    setSelectedConnection(data[0].id);
-                }
+            const data = await apiClient.connections.list();
+            setConnections(data);
+            if (data.length > 0) {
+                setSelectedConnection(data[0].id);
             }
         } catch (error) {
             console.error("Error fetching connections:", error);

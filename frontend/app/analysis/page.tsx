@@ -7,9 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { EnhancedChatInterface } from "@/components/chat/enhanced-chat-interface";
 import { Plus, Loader2 } from "lucide-react";
-import axios from "axios";
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
+import apiClient from "@/lib/api-client";
 
 export default function AnalysisPage() {
     const [selectedModel, setSelectedModel] = useState<string>("");
@@ -19,8 +17,7 @@ export default function AnalysisPage() {
     const { data: models = [], isLoading: modelsLoading } = useQuery({
         queryKey: ["models"],
         queryFn: async () => {
-            const response = await axios.get(`${API_URL}/api/v1/models`);
-            return response.data;
+            return await apiClient.get("/api/v1/models");
         },
     });
 
@@ -28,8 +25,7 @@ export default function AnalysisPage() {
     const { data: sessions = [], refetch: refetchSessions } = useQuery({
         queryKey: ["sessions"],
         queryFn: async () => {
-            const response = await axios.get(`${API_URL}/api/v1/chat/sessions`);
-            return response.data;
+            return await apiClient.sessions.list();
         },
     });
 
@@ -37,12 +33,12 @@ export default function AnalysisPage() {
         if (!selectedModel) return;
 
         try {
-            const response = await axios.post(`${API_URL}/api/v1/chat/sessions`, {
+            const response = await apiClient.sessions.create({
                 name: `Analysis ${new Date().toLocaleString()}`,
                 connection_id: parseInt(selectedModel),
             });
 
-            setSelectedSession(response.data.id);
+            setSelectedSession(response.id);
             refetchSessions();
         } catch (error) {
             console.error("Failed to create session:", error);

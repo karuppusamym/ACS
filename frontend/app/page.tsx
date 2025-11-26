@@ -5,10 +5,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Plus, Database, MessageSquare, Activity, TrendingUp } from "lucide-react";
 import Link from "next/link";
-import axios from "axios";
+import apiClient from "@/lib/api-client";
 import { useGlobalError } from "@/components/global-error-provider";
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
 
 export default function HomePage() {
   const { showError } = useGlobalError();
@@ -18,8 +16,7 @@ export default function HomePage() {
     queryKey: ["models"],
     queryFn: async () => {
       try {
-        const response = await axios.get(`${API_URL}/api/v1/models`);
-        return response.data;
+        return await apiClient.get("/api/v1/models");
       } catch (error) {
         showError("Failed to load models. Is the backend running?");
         return [];
@@ -32,8 +29,7 @@ export default function HomePage() {
     queryKey: ["sessions"],
     queryFn: async () => {
       try {
-        const response = await axios.get(`${API_URL}/api/v1/chat/sessions`);
-        return response.data;
+        return await apiClient.sessions.list();
       } catch (error) {
         // Don't show duplicate errors if both fail
         return [];
