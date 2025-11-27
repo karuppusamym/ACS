@@ -1,7 +1,7 @@
 """Input validation utilities"""
 import re
 from typing import Optional
-from pydantic import validator, BaseModel, EmailStr, Field
+from pydantic import field_validator, BaseModel, EmailStr, Field
 
 
 def validate_password_strength(password: str) -> str:
@@ -129,7 +129,8 @@ def validate_port(port: int) -> int:
 class ValidatedPasswordMixin(BaseModel):
     """Mixin for models that need password validation"""
 
-    @validator('password')
+    @field_validator('password', check_fields=False)
+    @classmethod
     def password_strength(cls, v):
         return validate_password_strength(v)
 
@@ -137,6 +138,7 @@ class ValidatedPasswordMixin(BaseModel):
 class ValidatedUsernameMixin(BaseModel):
     """Mixin for models that need username validation"""
 
-    @validator('username')
+    @field_validator('username', check_fields=False)
+    @classmethod
     def username_format(cls, v):
         return validate_username(v)
